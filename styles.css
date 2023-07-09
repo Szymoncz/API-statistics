@@ -1,0 +1,23 @@
+.container {
+    max-width: 1024px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+}
+
+select {
+    width: 100%;
+    text-align: center;
+}
+
+button {
+    width: 40%;
+    margin-top: 10px;
+}
+
+#button-div {
+    display: flex;
+    justify-content: center;
+}

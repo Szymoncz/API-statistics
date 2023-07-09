@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>KOIA FE Statistics on chart</title>
+</head>
+<body>
+<div class="container">
+    <h1>KOIA Norway statistics chart</h1>
+    <div>
+        <label for="start-year">Start Year:</label>
+        <select name="startYear" id="start-year"></select>
+
+        <label for="start-quarter">Start Quarter:</label>
+        <select name="startQuarter" id="start-quarter"></select>
+
+        <label for="end-year">End Year:</label>
+        <select name="endYear" id="end-year"></select>
+
+        <label for="end-quarter">End Quarter:</label>
+        <select name="endQuarter" id="end-quarter"></select>
+        <div id="button-div"><button id="generate-chart">Display chart</button></div>
+    </div>
+    <div>
+  <canvas id="myChart"></canvas>
+</div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jsonstat-toolkit@1.4.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
