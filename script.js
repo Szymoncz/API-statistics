@@ -149,7 +149,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const newChartUrl = chartUrl + '?params:' + startYearSelect.value + startQuarterSelect.value
         + '-' + endYearSelect.value + endQuarterSelect.value;
 
-
     const selectedLabels = labels.filter(function(label) {
       const year = label.substring(0, 4);
       const quarter = label.substring(4);
@@ -169,17 +168,12 @@ document.addEventListener("DOMContentLoaded", function() {
       );
     });
 
-    // Utwórz etykiety dla wykresu na podstawie wybranych danych
     const chartLabels = selectedLabels;
 
-    // Utwórz dane dla wykresu na podstawie wybranych wartości
     const chartData = selectedValues;
 
-    // Utwórz kontekst dla wykresu
     const ctx = document.getElementById("myChart");
 
-
-    // Utwórz wykres
     new Chart(ctx, {
       type: "bar",
       data: {
