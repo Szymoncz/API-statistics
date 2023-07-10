@@ -17,7 +17,12 @@ button {
     margin-top: 10px;
 }
 
-#button-div {
+.button-div {
     display: flex;
     justify-content: center;
+}
+
+#chart-link {
+    text-align: center;
+    width: 100%;
 }

@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const endYearSelect = document.getElementById("end-year");
   const endQuarterSelect = document.getElementById("end-quarter");
   const generateChartButton = document.getElementById("generate-chart");
-
+  const chartLink = document.getElementById("chart-link");
   const apiUrl = 'https://data.ssb.no/api/v0/en/table/05963';
   const params = {
     "query": [
@@ -103,12 +103,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   };
 
-   let labels = [];
+  let labels = [];
   let values = [];
+  let myChart;
 
   axios.post(apiUrl, params)
     .then(function(response) {
-      const ds = JSONstat(response.data).Dataset(0);
+       const ds = JSONstat(response.data).Dataset(0);
 
       labels = ds.Dimension("Tid").Category().map(function(Category) {
         return Category.label;
@@ -139,15 +140,41 @@ document.addEventListener("DOMContentLoaded", function() {
       console.error(error);
     });
 
-  generateChartButton.addEventListener("click", function() {
+   generateChartButton.addEventListener("click", function() {
+    generateChart();
+    updateChartLink();
+  });
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const storedParams = localStorage.getItem("chartParams");
+
+  if (urlParams.has("startYear") && urlParams.has("startQuarter") &&
+      urlParams.has("endYear") && urlParams.has("endQuarter")) {
+    const startYear = urlParams.get("startYear");
+    const startQuarter = urlParams.get("startQuarter");
+    const endYear = urlParams.get("endYear");
+    const endQuarter = urlParams.get("endQuarter");
+
+    startYearSelect.value = startYear;
+    startQuarterSelect.value = startQuarter;
+    endYearSelect.value = endYear;
+    endQuarterSelect.value = endQuarter;
+
+    saveParamsToLocalStorage(startYear, startQuarter, endYear, endQuarter);
+  } else if (storedParams) {
+    const { startYear, startQuarter, endYear, endQuarter } = JSON.parse(storedParams);
+
+    startYearSelect.value = startYear;
+    startQuarterSelect.value = startQuarter;
+    endYearSelect.value = endYear;
+    endQuarterSelect.value = endQuarter;
+  }
+
+  function generateChart() {
     const startYear = startYearSelect.value;
     const startQuarter = startQuarterSelect.value;
     const endYear = endYearSelect.value;
     const endQuarter = endQuarterSelect.value;
-
-    const chartUrl = window.location.href;
-    const newChartUrl = chartUrl + '?params:' + startYearSelect.value + startQuarterSelect.value
-        + '-' + endYearSelect.value + endQuarterSelect.value;
 
     const selectedLabels = labels.filter(function(label) {
       const year = label.substring(0, 4);
@@ -169,33 +196,76 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     const chartLabels = selectedLabels;
-
     const chartData = selectedValues;
 
     const ctx = document.getElementById("myChart");
 
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: chartLabels,
-        datasets: [
-          {
-            label: "Price",
-            data: chartData,
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
-            borderColor: "rgba(75, 192, 192, 1)",
-            borderWidth: 1
-          }
-        ]
-      },
-      options: {
+    if (myChart) {
+      myChart.data.labels = chartLabels;
+      myChart.data.datasets[0].data = chartData;
+      myChart.options = {
         responsive: true,
         scales: {
           y: {
             beginAtZero: true
           }
         }
-      }
-    });
-  });
+      };
+      myChart.update();
+    } else {
+      myChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: chartLabels,
+          datasets: [
+            {
+              label: "Price",
+              data: chartData,
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    saveParamsToLocalStorage(startYear, startQuarter, endYear, endQuarter);
+  }
+  function updateChartLink() {
+    const startYear = startYearSelect.value;
+    const startQuarter = startQuarterSelect.value;
+    const endYear = endYearSelect.value;
+    const endQuarter = endQuarterSelect.value;
+
+    const chartUrl = window.location.origin + window.location.pathname + "?startYear=" + startYear +
+      "&startQuarter=" + startQuarter + "&endYear=" + endYear + "&endQuarter=" + endQuarter;
+
+    chartLink.href = chartUrl;
+  }
+
+  function saveParamsToLocalStorage(startYear, startQuarter, endYear, endQuarter) {
+    const params = {
+      startYear,
+      startQuarter,
+      endYear,
+      endQuarter
+    };
+
+    localStorage.setItem("chartParams", JSON.stringify(params));
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has("startYear") && urlParams.has("startQuarter") &&
+      urlParams.has("endYear") && urlParams.has("endQuarter")) {
+    generateChart();
+  }})
 });
